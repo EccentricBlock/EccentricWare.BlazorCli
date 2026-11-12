@@ -1,0 +1,73 @@
+# Verification only: this workflow never publishes to NuGet and holds no publishing credentials.
+name: verify
+
+on:
+  pull_request:
+  push:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  release-gate:
+    name: release gate (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            playwright-install: npx playwright install --with-deps chromium
+          - os: windows-latest
+            playwright-install: npx playwright install chromium
+    steps:
+      # The stop-slop submodule is an authoring aid, not part of the build: do not fetch it.
+      - uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # tests/browser/package-lock.json pins the full dependency tree.
+      - name: Install Playwright and Chromium
+        working-directory: tests/browser
+        shell: bash
+        run: |
+          npm ci --no-audit --no-fund
+          ${{ matrix.playwright-install }}
+
+      # Runs the Python contract tests, packs and installs the template, generates and tests every
+      # name in verify_release.GENERATED_NAMES, then smoke-tests a copied publish folder and runs
+      # Chromium against both the source build and that copy.
+      - name: Full release verification
+        shell: bash
+        run: python scripts/verify_release.py --output-root artifacts/verification
+
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: verification-${{ matrix.os }}
+          if-no-files-found: warn
+          path: |
+            artifacts/verification/commands.log
+            artifacts/verification/result.json
+            artifacts/verification/package.sha256
+            artifacts/verification/packages/*.nupkg
+            tests/browser/test-results/
+            tests/browser/playwright-report/

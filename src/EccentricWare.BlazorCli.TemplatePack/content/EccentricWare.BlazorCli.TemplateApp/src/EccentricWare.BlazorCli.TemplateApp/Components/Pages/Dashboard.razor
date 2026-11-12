@@ -1,0 +1,52 @@
+@page "/"
+@inject IApplicationStatusService StatusService
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+
+<PageTitle>Application dashboard</PageTitle>
+<MudText Typo="Typo.h4" HtmlTag="h1" Class="mb-4">Application status</MudText>
+<MudGrid Spacing="3">
+    <MudItem xs="12" md="6">
+        <MudCard>
+            <MudCardContent>
+                <MudText Typo="Typo.h6">Current process</MudText>
+                <MudText data-testid="status-application">@_status.Application</MudText>
+                <MudText data-testid="status-version">Version: @_status.Version</MudText>
+                <MudText data-testid="status-mode">Mode: @_status.Mode</MudText>
+                <MudText data-testid="status-health">Status: @_status.Status</MudText>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="12" md="6">
+        <MudPaper Class="pa-4" Elevation="1">
+            <MudText Typo="Typo.h6">Interactive samples</MudText>
+            <MudText data-testid="counter-value">Counter: @_counter</MudText>
+            <MudStack Row="true" Spacing="2" Class="mt-3" Wrap="Wrap.Wrap">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Increment" data-testid="increment-counter">Increment</MudButton>
+                <MudButton Variant="Variant.Outlined" OnClick="ShowSnackbar" data-testid="show-snackbar">Show snackbar</MudButton>
+                <MudButton Variant="Variant.Outlined" OnClick="ShowDialog" data-testid="show-dialog">Open dialog</MudButton>
+            </MudStack>
+            <MudStack Row="true" AlignItems="AlignItems.Center" Class="mt-4">
+                <MudMenu Label="Actions" Variant="Variant.Outlined" data-testid="actions-menu">
+                    <MudMenuItem OnClick="SelectMenuItem">Select sample action</MudMenuItem>
+                </MudMenu>
+                <MudText data-testid="menu-selection">@_menuSelection</MudText>
+            </MudStack>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+@code {
+    private ApplicationStatusDto _status = default!;
+    private int _counter;
+    private string _menuSelection = "No action selected";
+
+    protected override void OnInitialized() => _status = StatusService.GetStatus(AppMode.Web);
+    private void Increment() => _counter++;
+    private void ShowSnackbar() => Snackbar.Add("Sample notification", Severity.Success);
+    private async Task ShowDialog()
+    {
+        await DialogService.ShowAsync<SampleDialog>("Sample dialog");
+    }
+    private void SelectMenuItem() => _menuSelection = "Sample action selected";
+}

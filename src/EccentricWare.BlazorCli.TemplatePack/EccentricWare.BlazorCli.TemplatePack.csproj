@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>true</IsPackable>
+    <PackageId>EccentricWare.BlazorCli</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>EccentricWare</Authors>
+    <Description>CLI-first .NET 10 application template with optional loopback MudBlazor dashboard.</Description>
+    <PackageTags>dotnet-new;templates;blazor;cli;mudblazor</PackageTags>
+    <PackageType>Template</PackageType>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <IncludeContentInPack>true</IncludeContentInPack>
+    <ContentTargetFolders>content</ContentTargetFolders>
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <NoDefaultExcludes>true</NoDefaultExcludes>
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
+  </PropertyGroup>
+  <!-- Deliberate source-file allowlist. Extend when adding supported file types. -->
+  <ItemGroup>
+    <!-- Directory-form PackagePath: a file name without an extension (LICENSE) is otherwise
+         treated by NuGet as a directory and packed at LICENSE/LICENSE. -->
+    <None Include="../../LICENSE" Pack="true" PackagePath="" />
+    <None Include="../../README.md" Pack="true" PackagePath="" />
+    <!-- One uniform recursive glob preserves the NuGet content folder hierarchy. The trailing
+         separator makes PackagePath a directory so extensionless files keep their names. -->
+    <Content Include="content/**/*"
+             Exclude="content/**/.template.config/**;content/**/bin/**;content/**/obj/**;content/**/node_modules/**;content/**/.git/**;content/**/.vs/**;content/**/artifacts/**;content/**/.env;content/**/.env.*;content/**/*.pfx;content/**/*.p12;content/**/*.pem;content/**/*.key;content/**/id_rsa*;content/**/id_ed25519*;content/**/appsettings.*.local.json;content/**/secrets.json"
+             Pack="true" PackagePath="content/" />
+    <!-- Explicitly include the dot-directory discovery file, regardless of wildcard dot-file rules. -->
+    <Content Include="content/EccentricWare.BlazorCli.TemplateApp/.template.config/template.json"
+             Pack="true" PackagePath="content/EccentricWare.BlazorCli.TemplateApp/.template.config/template.json" />
+  </ItemGroup>
+</Project>

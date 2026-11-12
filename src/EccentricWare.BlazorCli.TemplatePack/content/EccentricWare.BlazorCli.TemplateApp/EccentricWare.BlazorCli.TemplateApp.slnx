@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="src/EccentricWare.BlazorCli.TemplateApp/EccentricWare.BlazorCli.TemplateApp.csproj" />
+  <Project Path="tests/EccentricWare.BlazorCli.TemplateApp.Tests/EccentricWare.BlazorCli.TemplateApp.Tests.csproj" />
+</Solution>

@@ -1,0 +1,12 @@
+<MudDialog>
+    <TitleContent>Sample dialog</TitleContent>
+    <DialogContent>This dialog demonstrates interactive MudBlazor UI without changing application state.</DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Close" data-testid="close-dialog">Close</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] private IMudDialogInstance DialogInstance { get; set; } = default!;
+    private void Close() => DialogInstance.Close();
+}
